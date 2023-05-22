@@ -12,8 +12,7 @@ const Avatar = ({user}:AvatarProps) => {
         <div className={'relative '}>
             <div className={'relative inline-block rounded-full overflow-hidden h-9 w-9  md:h-11 md:w-11'}>
                 <Image
-                    width={50}
-                    height={50}
+                    fill
                     src={user?.image || '/Avatar.jpg'}
                     alt={'avatar'}
                 />
