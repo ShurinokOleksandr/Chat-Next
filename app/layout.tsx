@@ -1,25 +1,27 @@
 import './globals.css'
 import AuthContext from './context/AuthContext'
 import ToasterContext from './context/ToasterContext'
+import ActiveStatus from "./components/ActiveStatus";
 
 export const metadata = {
-  title: 'Messenger',
-  description: 'Messenger Clone',
+    title: 'Messenger',
+    description: 'Messenger Clone',
 }
 
 export default function RootLayout({
-                                     children,
+                                       children,
                                    }: {
-  children: React.ReactNode
+    children: React.ReactNode
 }) {
-  return (
-      <html lang="en">
-      <body className={'h-screen'}>
-      <AuthContext>
-        <ToasterContext />
-        {children}
-      </AuthContext>
-      </body>
-      </html>
-  )
+    return (
+        <html lang="en">
+        <body className={'h-screen'}>
+        <AuthContext>
+            <ToasterContext />
+            <ActiveStatus/>
+            {children}
+        </AuthContext>
+        </body>
+        </html>
+    )
 }

@@ -28,7 +28,6 @@ const SettingsModal = ({currentUser,isOpen,onClose}:SettingsModalProps) => {
             image:currentUser?.image
         }})
     const image = watch('image')
-    console.log(register,'register')
     const handleUpload = (relust:any) =>{
         setValue('image',relust?.info?.secure_url,{shouldValidate:true})
     }

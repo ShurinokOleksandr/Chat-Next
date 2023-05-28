@@ -1,6 +1,7 @@
 import {NextResponse} from "next/server";
 import prisma from "@/app/libs/prismadb";
 import getCurrentUser from "@/app/actions/getCurrentUser";
+import {pusherServer} from "@/app/libs/pusher";
 
 export async function POST(request:Request){
 
@@ -36,6 +37,11 @@ export async function POST(request:Request){
                     users:true
                 }
             })
+            newConversation.users.forEach((user) => {
+                if (user.email) {
+                    pusherServer.trigger(user.email, 'conversation:new', newConversation);
+                }
+            });
             return NextResponse.json(newConversation)
         }
 
@@ -63,23 +69,28 @@ export async function POST(request:Request){
         }
         const newConversation = await prisma.conversation.create({
             data:{
-               users:{
-                   connect:[
-                       {
-                           id:currentUser.id
-                       },
-                       {
-                           id:userId
-                       }
-                   ]
-               }
+                users:{
+                    connect:[
+                        {
+                            id:currentUser.id
+                        },
+                        {
+                            id:userId
+                        }
+                    ]
+                }
             },
             include:{
                 users:true
             }
         })
 
-    return NextResponse.json(newConversation)
+        newConversation.users.map((user) => {
+            if (user.email) {
+                pusherServer.trigger(user.email, 'conversation:new', newConversation);
+            }
+        });
+        return NextResponse.json(newConversation)
 
     }catch (e:any) {
         return new NextResponse("Internal Error",{status:500})

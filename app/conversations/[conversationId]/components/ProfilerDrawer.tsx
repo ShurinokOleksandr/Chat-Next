@@ -8,6 +8,8 @@ import {Dialog, Transition} from "@headlessui/react";
 import { IoClose, IoTrash } from 'react-icons/io5'
 import Avatar from "@/app/components/Avatar";
 import ConfirmModal from "@/app/conversations/[conversationId]/components/ConfirmModal";
+import AvatarGroup from "@/app/components/AvatarGroup";
+import useActiveList from "@/app/hooks/useActiveList";
 
 interface ProfilerDrawerProps {
     data:Conversation & {
@@ -19,7 +21,8 @@ interface ProfilerDrawerProps {
 
 const ProfilerDrawer = ({data,isOpen,onClose}:ProfilerDrawerProps) => {
     const otherUser = useOtherUser(data)
-
+    const {members} = useActiveList()
+    const isActive = members.indexOf(otherUser?.email!) !== -1;
     const [confirmOpen,setConfirmOpen]= useState(false)
 
     const joinedDate = useMemo(()=> {
@@ -34,8 +37,8 @@ const ProfilerDrawer = ({data,isOpen,onClose}:ProfilerDrawerProps) => {
         if(data.isGroup){
             return `${data.users.length} members`
         }
-        return 'Active'
-    },[data])
+        return isActive ? "Active" : "Offline"
+    },[data,isActive])
 
     return (
         <>
@@ -90,7 +93,11 @@ const ProfilerDrawer = ({data,isOpen,onClose}:ProfilerDrawerProps) => {
                                             <div className="relative mt-6 flex-1 px-4 sm:px-6">
                                                 <div className="flex flex-col items-center">
                                                     <div className="mb-2">
-                                                        <Avatar user={otherUser} />
+                                                        {
+                                                            data.isGroup
+                                                                ? <AvatarGroup users={data.users}/>
+                                                                : <Avatar user={otherUser}/>
+                                                        }
                                                     </div>
                                                     <div>
                                                         {title}
@@ -109,11 +116,31 @@ const ProfilerDrawer = ({data,isOpen,onClose}:ProfilerDrawerProps) => {
                                                         </div>
                                                     </div>
                                                     <div className="w-full py-5 sm:px-0 sm:pt-0">
-                                                        <dl className="space-y-8 px-4 sm:space-y-6 sm:px-6">
+                                                        <dl className="space-y-8 px-4  sm:space-y-6 sm:px-6 border-t  ">
+                                                            {data.isGroup && (
+                                                                <div>
+                                                                    <dt
+                                                                        className="text-sm pt-3 font-medium text-gray-500 sm:w-40 sm:flex-shrink-0
+                                "
+                                                                    >
+                                                                        Emails
+                                                                    </dt>
+                                                                    <dd
+                                                                        className="
+                                  mt-1
+                                  text-sm
+                                  text-gray-900
+                                  sm:col-span-2
+                                "
+                                                                    >
+                                                                        {data.users.map((user) => user.email).join(', ')}
+                                                                    </dd>
+                                                                </div>
+                                                            )}
                                                             {
                                                                 !data.isGroup && (
                                                                     <div>
-                                                                        <dt className={'text-sm font-medium text-gray-500 sm:w-40 sm:flex-shrink-0'}>
+                                                                        <dt className={'text-sm pt-3 font-medium text-gray-500 sm:w-40 sm:flex-shrink-0'}>
                                                                             Emails
                                                                         </dt>
                                                                         <dd
@@ -124,21 +151,12 @@ const ProfilerDrawer = ({data,isOpen,onClose}:ProfilerDrawerProps) => {
                                                                     </div>
                                                                 )
                                                             }
-                                                            {!data.isGroup && (
-                                                                <div>
-                                                                    <dt className="text-sm font-medium text-gray-500 sm:w-40 sm:flex-shrink-0">
-                                                                        Email
-                                                                    </dt>
-                                                                    <dd className={'mt-1 text-sm text-gray-900 sm:col-span-2'}>
-                                                                        {otherUser.email}
-                                                                    </dd>
-                                                                </div>
-                                                            )}
+
                                                             {!data.isGroup && (
                                                                 <>
                                                                     <hr />
                                                                     <div>
-                                                                        <dt className="text-sm font-medium text-gray-500 sm:w-40 sm:flex-shrink-0">
+                                                                        <dt className="text-sm pt-3 font-medium text-gray-500 sm:w-40 sm:flex-shrink-0">
                                                                             Joined
                                                                         </dt>
                                                                         <dd  className={'mt-1 text-sm text-gray-900 sm:col-span-2'}>
